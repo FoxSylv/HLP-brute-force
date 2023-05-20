@@ -10,7 +10,7 @@
  *
  * Finds the number of unique ss outputs of the given function.
  */
-int getUniqueOutputCount(unsigned long long function) {
+int getUniqueOutputCount(HLPFunction function) {
     /* Set up counter */
     int ssCount[16];
     for (int i = 0; i < 16; ++i) {
@@ -35,11 +35,11 @@ int getUniqueOutputCount(unsigned long long function) {
  * Returns an 2d array with all one-layer functions such that the first indice
  * indicates how many unique outputs get removed by applying that function.
  */
-unsigned long long** getAllLayers() {
+HLPLayer** getAllLayers() {
     /* Set up memory */
-    unsigned long long** layers = (unsigned long long**)malloc(16 * sizeof(unsigned long long*));
+    HLPLayer** layers = (HLPLayer**)malloc(16 * sizeof(HLPLayer*));
     for (int i = 0; i < 16; ++i) {
-        layers[i] = (unsigned long long*)malloc(MAX_LAYER_SPACE * sizeof(unsigned long long));
+        layers[i] = (HLPLayer*)malloc(MAX_LAYER_SPACE * sizeof(HLPLayer));
         for (int l = 0; l < MAX_LAYER_SPACE; ++l) {
             layers[i][l] = 0;
         }
@@ -54,7 +54,7 @@ unsigned long long** getAllLayers() {
         for (unsigned int backSS = 0; backSS < 16; ++backSS) {
             for (int isSideSMode = 0; isSideSMode < 2; ++isSideSMode) {
                 for (int isBackSMode = 0; isBackSMode < 2; ++isBackSMode) {
-                    unsigned long long layer = createLayer(sideSS, backSS, isSideSMode, isBackSMode);
+                    HLPLayer layer = createLayer(sideSS, backSS, isSideSMode, isBackSMode);
                     if (layer != 0 && layer != 0xFEDCBA9876543210) {
                         /* Do not include duplicates */
                         int isDuplicate = 0;
@@ -87,7 +87,7 @@ unsigned long long** getAllLayers() {
  * Note that if a solution is found, it may not necessarily be the most
  * optimal number of layers due to the depth-first search.
  */
-int findSolutionRecursive(unsigned long long desiredResult, unsigned long long currentFunction, int uniqueOutputMargin, unsigned long long* solutionStack, int* currentDepth, int maxDepth, unsigned long long** layers) {
+int findSolutionRecursive(HLPFunction desiredResult, HLPFunction currentFunction, int uniqueOutputMargin, HLPLayer* solutionStack, int* currentDepth, int maxDepth, HLPLayer** layers) {
     /* Base cases */
     if (currentFunction == desiredResult) {
         return 1;
@@ -111,8 +111,8 @@ int findSolutionRecursive(unsigned long long desiredResult, unsigned long long c
     ++*currentDepth;
     for (int r = 0; r <= uniqueOutputMargin; ++r) {
         int newMargin = uniqueOutputMargin - r;
-        for (unsigned long long* layer = layers[r]; *layer; ++layer) {
-            unsigned long long newFunction = composeFunctions(currentFunction, *layer);
+        for (HLPLayer* layer = layers[r]; *layer; ++layer) {
+            HLPFunction newFunction = composeFunctions(currentFunction, *layer);
             solutionStack[*currentDepth] = *layer;
             if (findSolutionRecursive(desiredResult, newFunction, newMargin, solutionStack, currentDepth, maxDepth, layers)) {
                 return 1;
@@ -124,7 +124,7 @@ int findSolutionRecursive(unsigned long long desiredResult, unsigned long long c
 }
 
 
-void printSolution(unsigned long long* solutionStack, int stackSize) {
+void printSolution(HLPLayer* solutionStack, int stackSize) {
     for (int s = 0; s < stackSize; ++s) {
         printf("%llx\n", solutionStack[s]);
     }
@@ -136,10 +136,10 @@ void printSolution(unsigned long long* solutionStack, int stackSize) {
  * Finds and prints a solution for the given function if one exists in the
  * given number of layers. Otherwise returns NULL.
  */
-void findSolution(unsigned long long function, int maxDepth) {
+void findSolution(HLPFunction function, int maxDepth) {
     /* Initialize starting values */
-    unsigned long long** layers = getAllLayers();
-    unsigned long long* solutionStack = (unsigned long long*)malloc(maxDepth * sizeof(unsigned long long));
+    HLPLayer** layers = getAllLayers();
+    HLPLayer* solutionStack = (HLPLayer*)malloc(maxDepth * sizeof(HLPLayer));
     int solutionDepth = -1;
 
     /* Find and print solution, if it exists */
@@ -161,6 +161,6 @@ void findSolution(unsigned long long function, int maxDepth) {
 
 
 int main(int argc, char** argv) {
-    unsigned long long temp = 0x8080808080808080;
-    findSolution(temp, 7);
+    unsigned long long temp = 0x123456789ABCDEF0;
+    findSolution(temp, 5);
 }

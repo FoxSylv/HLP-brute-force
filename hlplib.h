@@ -1,9 +1,12 @@
 #ifndef HLPLIB
 #define HLPLIB
 
-unsigned long long createLayer(unsigned int sideSS, unsigned int backSS, int isSideSMode, int isBackSMode);
-unsigned long long composeFunctions(unsigned long long function1, unsigned long long function2);
-unsigned int* extractFunctionData(unsigned long long function);
-unsigned long long compactFunction(unsigned int* function);
+typedef unsigned long long HLPFunction;
+typedef unsigned long long HLPLayer;
+
+HLPLayer createLayer(unsigned int sideSS, unsigned int backSS, int isSideSMode, int isBackSMode);
+HLPFunction composeFunctions(HLPFunction function1, HLPFunction function2);
+unsigned int* extractFunctionData(HLPFunction function);
+HLPFunction compactFunction(unsigned int* function);
 
 #endif
